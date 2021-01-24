@@ -1,5 +1,11 @@
-import pino, { LoggerOptions as PinoLoggerOptions } from 'pino'
+import pino, {
+  Logger as PinoLogger,
+  LoggerOptions as PinoLoggerOptions,
+} from 'pino'
 
+/**
+ * @see https://github.com/pinojs/pino/blob/v6.3.1/docs/api.md#options
+ */
 export type LoggerOptions = PinoLoggerOptions
 
 const createLogger = (options: LoggerOptions = {}) => {
@@ -35,11 +41,11 @@ const createLogger = (options: LoggerOptions = {}) => {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
   logger.profile = profile
 
-  return logger as pino.Logger & { profile: typeof profile }
+  return logger as PinoLogger & { profile: typeof profile }
 }
 
 export type Logger = ReturnType<typeof createLogger>

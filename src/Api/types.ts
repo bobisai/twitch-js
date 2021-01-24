@@ -4,8 +4,8 @@ import { FetchOptions } from '../utils/fetch'
 import { LoggerOptions } from '../utils/logger'
 
 export type ApiOptions = {
+  token: string
   clientId?: string
-  token?: string
   log?: LoggerOptions
   onAuthenticationFailure?: () => Promise<string>
 }
@@ -32,8 +32,8 @@ export const Settings: Record<ApiVersions, ApiSettings> = {
   },
 }
 
-export type ApiHeaders = {
-  'Client-ID': string
+export type ApiHeaders = Record<string, string> & {
+  'Client-ID'?: string
   Accept?: string
   Authorization?: string
 }

@@ -1,0 +1,8 @@
+name: 'Release'
+description: 'Publishes package to NPM'
+
+runs:
+  using: 'composite'
+  steps:
+    - run: ${{ github.action_path }}/release.sh
+      shell: bash

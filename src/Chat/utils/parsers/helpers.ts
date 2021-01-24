@@ -51,18 +51,23 @@ export const badges = (maybeBadges: string): Partial<Badges> => {
   return typeof maybeBadges === 'string'
     ? maybeBadges.split(',').reduce((parsed, badge) => {
         const [rawKey, value] = badge.split('/')
+
+        if (typeof value === 'undefined') {
+          return parsed
+        }
+
         const key = camelCase(rawKey)
 
-        if (BooleanBadges[key] === 'boolean') {
+        if (key in BooleanBadges) {
           return { ...parsed, [key]: generalBoolean(value) }
         }
 
-        if (NumberBadges[key] === 'number') {
+        if (key in NumberBadges) {
           return { ...parsed, [key]: parseInt(value, 10) }
         }
 
         return { ...parsed, [key]: value }
-      }, {} as Badges)
+      }, {} as Partial<Badges>)
     : {}
 }
 
@@ -84,7 +89,7 @@ export const emotes = (maybeEmotes: string) => {
 
     return [
       ...emoteTag,
-      ...indices.split(',').map(index => {
+      ...indices.split(',').map((index) => {
         const [start, end] = index.split('-')
         return { id, start: parseInt(start, 10), end: parseInt(end, 10) }
       }),
@@ -101,7 +106,7 @@ export const mods = (message: string) => {
   return modList.split(', ')
 }
 
-export const username = (...maybeUsernames: any[]): string | undefined =>
+export const username = (...maybeUsernames: any[]): string =>
   maybeUsernames.reduce((maybeUsername, name) => {
     if (typeof name !== 'string') {
       return maybeUsername

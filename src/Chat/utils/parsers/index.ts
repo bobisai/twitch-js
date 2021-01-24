@@ -10,35 +10,36 @@ import toUpper from 'lodash/toUpper'
 
 import {
   BaseMessage,
-  Commands,
-  JoinMessage,
-  PartMessage,
-  ModeMessages,
   ChatEvents,
+  ClearChatMessages,
+  ClearMessageMessage,
+  Commands,
   Events,
-  NamesMessage,
-  NamesEndMessage,
+  GiftPaidUpgradeParameters,
   GlobalUserStateMessage,
   HostTargetMessage,
-  RoomStateMessage,
-  NoticeMessage,
-  UserNoticeTags,
+  JoinMessage,
   KnownNoticeMessageIds,
-  UserStateMessage,
   KnownUserNoticeMessageIds,
-  ClearChatMessages,
-  NoticeMessages,
+  ModeMessages,
+  NamesEndMessage,
+  NamesMessage,
   NoticeEvents,
-  PrivateMessages,
+  NoticeMessage,
+  NoticeMessages,
   NoticeTags,
-  UserNoticeMessages,
-  GiftPaidUpgradeParameters,
+  PartMessage,
+  PrivateMessages,
   RaidParameters,
   ResubscriptionParameters,
   RitualParameters,
+  RoomStateMessage,
   SubscriptionGiftCommunityParameters,
   SubscriptionGiftParameters,
   SubscriptionParameters,
+  UserNoticeMessages,
+  UserNoticeTags,
+  UserStateMessage,
 } from '../../../twitch'
 
 import * as constants from '../../constants'
@@ -46,7 +47,7 @@ import * as utils from '../'
 import * as helpers from './helpers'
 import * as tagParsers from './tags'
 
-export const base = (rawMessages: string, username: string): BaseMessage[] => {
+export const base = (rawMessages: string, username = ''): BaseMessage[] => {
   const rawMessagesV = rawMessages.split(/\r?\n/g)
 
   return rawMessagesV.reduce((messages, rawMessage) => {
@@ -235,8 +236,8 @@ export const globalUserStateMessage = (
 
   return {
     ...other,
-    command: Commands.GLOBAL_USER_STATE,
-    event: Commands.GLOBAL_USER_STATE,
+    command: Commands.GLOBALUSERSTATE,
+    event: Commands.GLOBALUSERSTATE,
     tags: tagParsers.globalUserState(tags),
   }
 }
@@ -275,6 +276,27 @@ export const clearChatMessage = (
 }
 
 /**
+ * Single message removal on a channel.
+ * @see https://dev.twitch.tv/docs/irc/commands#clearmsg-twitch-commands
+ */
+export const clearMessageMessage = (
+  baseMessage: BaseMessage,
+): ClearMessageMessage => {
+  const { tags } = baseMessage
+
+  return {
+    ...baseMessage,
+    tags: {
+      login: tags.login,
+      targetMsgId: tags.targetMsgId,
+    },
+    command: Commands.CLEAR_MESSAGE,
+    event: Commands.CLEAR_MESSAGE,
+    targetMessageId: tags.targetMsgId,
+  }
+}
+
+/**
  * Host starts or stops a message.
  * @see https://dev.twitch.tv/docs/irc/commands/#hosttarget-twitch-commands
  */
@@ -300,7 +322,6 @@ export const hostTargetMessage = (
     numberOfViewers: isFinite(toNumber(numberOfViewers))
       ? parseInt(numberOfViewers, 10)
       : undefined,
-    message: undefined,
   }
 }
 
@@ -383,7 +404,7 @@ export const privateMessage = (baseMessage: BaseMessage): PrivateMessages => {
       ...userStateMessage(baseMessage),
       command: Commands.PRIVATE_MESSAGE,
       event: ChatEvents.CHEER,
-      bits: helpers.generalNumber(tags.bits),
+      bits: parseInt(tags.bits, 10),
     }
   }
 
@@ -445,7 +466,7 @@ export const userNoticeMessage = (
     ...tagParsers.userNotice(baseMessage.tags),
     systemMsg: helpers.generalString(baseMessage.tags.systemMsg),
   } as UserNoticeTags
-  const systemMessage = helpers.generalString(baseMessage.tags.systemMsg)
+  const systemMessage = helpers.generalString(baseMessage.tags.systemMsg) || ''
   const parameters = tagParsers.userNoticeMessageParameters(tags)
 
   switch (tags.msgId) {

@@ -1,13 +1,11 @@
 import {
   ClearChatMessages,
   Events,
-  GlobalUserStateMessage,
   HostingAutoPrivateMessage,
   HostingPrivateMessage,
   HostingWithViewersPrivateMessage,
   HostTargetMessage,
   JoinMessage,
-  Message,
   Messages,
   ModeMessages,
   NamesEndMessage,
@@ -35,7 +33,9 @@ import {
 
 import { LoggerOptions } from '../utils/logger'
 
-type BaseChatOptions = {
+import { ClientEventTypes, BaseClientEvents } from '../Client/types'
+
+export type ChatOptions = {
   username?: string
   /**
    * OAuth token
@@ -52,27 +52,25 @@ type BaseChatOptions = {
    * @see https://dev.twitch.tv/docs/irc/guide/#known-and-verified-bots
    */
   isVerified?: boolean
-  connectionTimeout?: number
-  joinTimeout?: number
+  connectionTimeout: number
+  joinTimeout: number
   log?: LoggerOptions
   onAuthenticationFailure?: () => Promise<string>
 }
 
-export type ChatOptions = BaseChatOptions & ClientOptions
-
 export type ClientOptions = {
   username?: string
   token?: string
-  isKnown?: boolean
-  isVerified?: boolean
-  server?: string
-  port?: number
-  ssl?: boolean
+  isKnown: boolean
+  isVerified: boolean
+  server: string
+  port: number
+  ssl: boolean
   log?: LoggerOptions
 }
 
 export enum ChatReadyStates {
-  'NOT_READY',
+  'WAITING',
   'CONNECTING',
   'RECONNECTING',
   'CONNECTED',
@@ -81,8 +79,8 @@ export enum ChatReadyStates {
 }
 
 export type ChannelState = {
-  userState: UserStateTags
   roomState: RoomStateTags
+  userState?: UserStateTags
 }
 
 export type ChannelStates = Record<string, ChannelState>
@@ -106,12 +104,13 @@ export enum NoticeCompounds {
   EMOTE_ONLY_ON = 'NOTICE/EMOTE_ONLY_ON',
   FOLLOWERS_OFF = 'NOTICE/FOLLOWERS_OFF',
   FOLLOWERS_ON = 'NOTICE/FOLLOWERS_ON',
-  FOLLOWERS_ON_ZERO = 'NOTICE/FOLLOWERS_ON_ZERO',
+  FOLLOWERS_ONZERO = 'NOTICE/FOLLOWERS_ONZERO',
   HOST_OFF = 'NOTICE/HOST_OFF',
   HOST_ON = 'NOTICE/HOST_ON',
   HOSTS_REMAINING = 'NOTICE/HOSTS_REMAINING',
   MSG_CHANNEL_SUSPENDED = 'NOTICE/MSG_CHANNEL_SUSPENDED',
   MOD_SUCCESS = 'NOTICE/MOD_SUCCESS',
+  NOT_HOSTING = 'NOTICE/NOT_HOSTING',
   R9K_OFF = 'NOTICE/R9K_OFF',
   R9K_ON = 'NOTICE/R9K_ON',
   ROOM_MODS = 'NOTICE/ROOM_MODS',
@@ -121,6 +120,7 @@ export enum NoticeCompounds {
   SUBS_ON = 'NOTICE/SUBS_ON',
   TIMEOUT_SUCCESS = 'NOTICE/TIMEOUT_SUCCESS',
   UNBAN_SUCCESS = 'NOTICE/UNBAN_SUCCESS',
+  UNMOD_SUCCESS = 'NOTICE/UNMOD_SUCCESS',
   UNRAID_SUCCESS = 'NOTICE/UNRAID_SUCCESS',
   UNRECOGNIZED_CMD = 'NOTICE/UNRECOGNIZED_CMD',
 }
@@ -143,10 +143,9 @@ export enum UserNoticeCompounds {
   SUBSCRIPTION_GIFT_COMMUNITY = 'USERNOTICE/SUBSCRIPTION_GIFT_COMMUNITY',
 }
 
-export type EventTypes = {
-  [Events.RAW]: [string]
+export type EventTypes = Omit<ClientEventTypes, BaseClientEvents.ALL> & {
   [Events.ALL]: [Messages]
-  [Events.GLOBAL_USER_STATE]: [GlobalUserStateMessage]
+
   [Events.JOIN]: [JoinMessage]
   [Events.PART]: [PartMessage]
   [Events.ROOM_STATE]: [RoomStateMessage]
@@ -181,7 +180,7 @@ export type EventTypes = {
   [Events.EMOTE_ONLY_ON]: [NoticeMessage]
   [Events.FOLLOWERS_OFF]: [NoticeMessage]
   [Events.FOLLOWERS_ON]: [NoticeMessage]
-  [Events.FOLLOWERS_ON_ZERO]: [NoticeMessage]
+  [Events.FOLLOWERS_ONZERO]: [NoticeMessage]
   [Events.HOST_OFF]: [NoticeMessage]
   [Events.HOST_ON]: [NoticeMessage]
   [Events.HOSTS_REMAINING]: [NoticeMessage]
@@ -217,7 +216,7 @@ export type EventTypes = {
   [NoticeCompounds.EMOTE_ONLY_ON]: [NoticeMessage]
   [NoticeCompounds.FOLLOWERS_OFF]: [NoticeMessage]
   [NoticeCompounds.FOLLOWERS_ON]: [NoticeMessage]
-  [NoticeCompounds.FOLLOWERS_ON_ZERO]: [NoticeMessage]
+  [NoticeCompounds.FOLLOWERS_ONZERO]: [NoticeMessage]
   [NoticeCompounds.HOST_OFF]: [NoticeMessage]
   [NoticeCompounds.HOST_ON]: [NoticeMessage]
   [NoticeCompounds.HOSTS_REMAINING]: [NoticeMessage]
@@ -283,5 +282,5 @@ export type EventTypes = {
     UserNoticeSubscriptionGiftCommunityMessage,
   ]
 
-  [key: string]: [string | Messages | Message]
+  [eventName: string]: [Messages] // This break p-event typing.
 }

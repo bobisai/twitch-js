@@ -1,11 +1,8 @@
-# This file
-CODEOWNERS    @marcandrews
-
-# Documentation
-/docs         @marcandrews
+# Repository settings
+/.github      @marcandrews
 
 # Root files
 /*.*          @marcandrews
 
-# Wesbite
-/website      @marcandrews
+# E2E tests
+/__e2e__      @marcandrews

@@ -2,12 +2,11 @@
   <img width="128" src="media/logo.svg">
 </p>
 
-# [TwitchJS](https://twitch-js.github.io/twitch-js)
+# [TwitchJS](https://twitch-js.netlify.com/)
 
-[![Travis branch](https://img.shields.io/travis/com/twitch-js/twitch-js?longCache=true&style=flat-square)](https://travis-ci.org/twitch-js/twitch-js)
-[![Coverage Status](https://img.shields.io/codecov/c/github/twitch-js/twitch-js/next.svg?longCache=true&style=flat-square)](https://codecov.io/gh/twitch-js/twitch-js/branch/next)
+[![Build status](https://img.shields.io/github/workflow/status/twitch-js/twitch-js/ci?style=flat-square)](https://github.com/twitch-js/twitch-js/actions)
+[![Coverage status](https://img.shields.io/codecov/c/github/twitch-js/twitch-js/next.svg?longCache=true&style=flat-square)](https://codecov.io/gh/twitch-js/twitch-js/branch/next)
 [![NPM version](https://img.shields.io/npm/v/twitch-js.svg?longCache=true&style=flat-square)](https://www.npmjs.com/package/twitch-js)
-[![NPM version@next](https://img.shields.io/npm/v/twitch-js/next.svg?longCache=true&style=flat-square)](https://www.npmjs.com/package/twitch-js/v/next)
 [![NPM downloads](https://img.shields.io/npm/dm/twitch-js.svg?longCache=true&style=flat-square)](https://www.npmjs.com/package/twitch-js)
 [![GitHub issues](https://img.shields.io/github/issues-raw/twitch-js/twitch-js.svg?longCache=true&style=flat-square)](https://github.com/twitch-js/twitch-js/issues)
 [![GitHub bug issues](https://img.shields.io/github/issues-raw/twitch-js/twitch-js/bug?style=flat-square)](https://github.com/twitch-js/twitch-js/issues?q=is%3Aopen+is%3Aissue+label%3Abug)
@@ -51,7 +50,7 @@ If you are using a module bundler, such [Webpack](https://webpack.js.org/),
 
 1. Add TwitchJS to your project:
    ```bash
-   npm install --save twitch-js@next
+   npm install --save twitch-js
    ```
 2. Import TwitchJS
 
@@ -132,13 +131,13 @@ const onAuthenticationFailure = () =>
       client_id: clientId,
       client_secret: clientSecret,
     },
-  }).then(response => response.accessToken)
+  }).then((response) => response.accessToken)
 
 const token = 'cfabdegwdoklmawdzdo98xt2fo512y'
 const username = 'ronni'
 const twitchJs = new TwitchJs({ token, username, onAuthenticationFailure })
 
-twitchJs.chat.connect().then(globalUserState => {
+twitchJs.chat.connect().then((globalUserState) => {
   // Do stuff ...
 })
 ```
@@ -155,7 +154,11 @@ more information on authentication.
 
 ## Examples
 
-Please see the `examples` folder for browser, Node and TypeScript examples.
+Examples are provided via [CodeSandbox](https://codesandbox.io):
+
+- [Browser](https://codesandbox.io/s/twitch-js-browser-example-upf4x)
+- [Node](https://codesandbox.io/s/twitch-js-node-example-mnel5)
+- [TypeScript](https://codesandbox.io/s/twitch-js-typescript-example-tnnys)
 
 ## Contribution guidelines
 

@@ -42,10 +42,10 @@ export default [
     },
     plugins: [
       aliasPlugin,
-      resolve(),
+      resolve({ browser: true, preferBuiltins: true }),
       commonjs(),
       typescript({
-        tsconfig: resolvedConfig => ({
+        tsconfig: (resolvedConfig) => ({
           ...resolvedConfig,
           declaration: false,
         }),
@@ -57,19 +57,17 @@ export default [
 
   {
     input: 'src/index.ts',
-    output: [
-      { file: pkg.module, format: 'es', exports: 'named', sourcemap: true },
-    ],
+    output: [{ file: pkg.module, format: 'es', sourcemap: true }],
     plugins: [
       typescript({
-        tsconfig: resolvedConfig => ({
+        tsconfig: (resolvedConfig) => ({
           ...resolvedConfig,
           declarationDir: 'types',
         }),
       }),
       ...commonPlugins,
     ],
-    external: id =>
-      Object.keys(pkg.dependencies).some(dep => id.startsWith(dep)),
+    external: (id) =>
+      Object.keys(pkg.dependencies).some((dep) => id.startsWith(dep)),
   },
 ]

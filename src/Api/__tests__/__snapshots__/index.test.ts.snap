@@ -31,20 +31,6 @@ Array [
 ]
 `;
 
-exports[`Api headers should create headers with clientId 1`] = `
-Array [
-  Array [
-    "https://api.twitch.tv/helix/",
-    Object {
-      "headers": Object {
-        "Client-ID": "CLIENT_ID",
-      },
-      "method": "get",
-    },
-  ],
-]
-`;
-
 exports[`Api headers should create headers with clientId and token 1`] = `
 Array [
   Array [
@@ -80,7 +66,7 @@ Object {
 }
 `;
 
-exports[`Api methods should throw on failure 1`] = `[Error: [TwitchJS] https://api.twitch.tv/helix/404 Not Found]`;
+exports[`Api methods should throw on failure 1`] = `[FetchError: [TwitchJS] https://api.twitch.tv/helix/404 Not Found]`;
 
 exports[`Api versions should call the Helix endpoint 1`] = `
 Object {

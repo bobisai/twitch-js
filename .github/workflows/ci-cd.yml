@@ -1,0 +1,78 @@
+name: CI-CD
+
+on:
+  push:
+    branches: [next]
+  pull_request:
+    branches: [next]
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.RELEASE_TOKEN || github.token }}
+
+      - uses: actions/setup-node@v2
+        if: ${{ github.event_name == 'push' }}
+        with:
+          node-version: '12.x'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Audit dependencies
+        continue-on-error: true
+        run: yarn audit --level moderate
+
+      - name: Check integrity
+        run: yarn check --integrity
+
+      - name: Check style
+        run: yarn prettier
+
+      - name: Lint codebase
+        run: yarn lint
+
+      - name: Check types
+        run: yarn test:types
+
+      - name: Run unit tests
+        run: yarn test:coverage
+
+      - name: Report coverage
+        uses: codecov/codecov-action@v1
+
+      - name: Build
+        run: yarn build
+
+      - name: Lint generated types
+        run: yarn lint:generated-types
+
+      - name: Refresh access token
+        if: |
+          !contains(github.event.head_commit.message, 'deploy skip') && 
+          github.event_name == 'push'
+        uses: ./.github/actions/refresh-access-token
+        with:
+          client-id: ${{ secrets.TWITCH_CLIENT_ID }}
+          client-secret: ${{ secrets.TWITCH_CLIENT_SECRET }}
+          refresh-token: ${{ secrets.TWITCH_REFRESH_TOKEN }}
+
+      - name: Run E2E tests
+        if: |
+          !contains(github.event.head_commit.message, 'deploy skip') &&
+          github.event_name == 'push'
+        env:
+          TWITCH_USERNAME: ${{ secrets.TWITCH_USERNAME }}
+        run: yarn test:e2e
+
+      - name: Release
+        if: |
+          !contains(github.event.head_commit.message, 'deploy skip') && 
+          github.event_name == 'push'
+        uses: ./.github/actions/release
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
